@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import './App.css';
-import Countdown from 'countdown';
+import * as Countdown from 'countdown';
 
 function App() {
 	const [countdown, setCountdown] = useState<countdown.Timespan | null>();
