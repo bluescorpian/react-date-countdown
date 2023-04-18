@@ -1,14 +1,12 @@
 import { useState, useMemo, useEffect } from 'react';
 import './App.css';
-import * as Countdown from 'countdown';
+import countdown from './countdown';
 
 function App() {
-	const [countdown, setCountdown] = useState<countdown.Timespan | null>();
-
-	const queryParams = useMemo(() => new URLSearchParams(window.location.search), [document.location.search]);
+	const [formattedCountdown, setCountdown] = useState<countdown.Timespan | null>();
 
 	const targetDate = useMemo(() => {
-		const rawEpoch = queryParams.get('t');
+		const rawEpoch = new URLSearchParams(window.location.search).get('t');
 
 		if (rawEpoch !== null) {
 			const epoch = parseInt(rawEpoch);
@@ -17,20 +15,24 @@ function App() {
 			}
 		}
 		return Date.now();
-	}, [queryParams.get('t')]);
+	}, [window.location.search]);
 
 	const now = Date.now();
 
 	function calculateCountdown() {
 		if (targetDate) {
-			const timeSpan = Countdown(Date.now(), targetDate, Countdown.DEFAULTS, 2) as countdown.Timespan;
-			setCountdown(timeSpan);
+			const formatted = countdown(Date.now(), targetDate, countdown.DEFAULTS, 2) as countdown.Timespan;
+			setCountdown(formatted);
 		}
 	}
 
 	function formatCountdown(html: boolean) {
-		if (countdown) {
-			return (targetDate > now ? 'in ' : '') + (html ? countdown.toHTML('b', 'now') : countdown.toString('now')) + (targetDate < now ? ' ago' : '');
+		if (formattedCountdown) {
+			return (
+				(targetDate > now ? 'in ' : '') +
+				(html ? formattedCountdown.toHTML('b', 'now') : formattedCountdown.toString('now')) +
+				(targetDate < now ? ' ago' : '')
+			);
 		} else return 'now';
 	}
 
