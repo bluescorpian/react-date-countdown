@@ -14,14 +14,21 @@ function App() {
 				return epoch;
 			}
 		}
-		return Date.now();
+		return Date.now() + 60 * 1000;
 	}, [window.location.search]);
 
 	const now = Date.now();
+	const timeDifference = Math.abs(now - targetDate);
+	const withinASecond = timeDifference > 1000;
 
 	function calculateCountdown() {
-		if (targetDate) {
-			const formatted = countdown(Date.now(), targetDate, countdown.DEFAULTS, 2) as countdown.Timespan;
+		if (targetDate !== undefined) {
+			const formatted = countdown(
+				Date.now(),
+				targetDate,
+				withinASecond ? countdown.DEFAULTS : countdown.DEFAULTS | countdown.MILLISECONDS,
+				2
+			) as countdown.Timespan;
 			setCountdown(formatted);
 		}
 	}
@@ -38,10 +45,10 @@ function App() {
 
 	useEffect(() => {
 		calculateCountdown();
-		const interval = setInterval(() => calculateCountdown(), 1000);
+		const interval = setInterval(() => calculateCountdown(), withinASecond ? 1000 : 51);
 
 		return () => clearInterval(interval);
-	}, [targetDate]);
+	}, [targetDate, withinASecond]);
 
 	document.title = formatCountdown(false);
 
